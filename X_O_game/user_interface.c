@@ -1,5 +1,6 @@
+#pragma once
 #include "UI.h"
-
+#include "logic.h"
 void start_message() {
 	printf("#########################################################################################\n");
 	printf("------------------------------------BOOTING X_0 GAME-------------------------------------\n");
@@ -45,8 +46,11 @@ void multipl_confirmation(char* first_player_name, char* second_player_name, int
 
 void show_table(char** matr, int table_size, int line_idx, int col_idx, char* player) {
 	system("clear");
-	printf("\n      Player %s chooses:\n", player);
-	printf("      ");
+	if(player != NULL) {
+		printf("\n      Player %s chooses:\n\n", player);
+		printf("     To move use WASD. After deciding press SPACE. All commands have to be followed by ENTER\n");
+	}
+	printf("\n      ");
 	printf("\n      ");
 	int ok1 = 0, ok2 = 0;
 	for(int i = 0; i < table_size; i++) {
@@ -89,45 +93,69 @@ void show_table(char** matr, int table_size, int line_idx, int col_idx, char* pl
 		printf("\n\n");
 }
 
-void player_moves(int *line_idx, int *col_index, char direction, int table_size) {
-	switch (direction)
-	{
-	case 'W':
-		if(*line_idx > 0)
-			*line_idx--;
-		break;
-	case 'S':
-		if(*line_idx < table_size)
-			*line_idx--;
-		break;
-	case 'D':
-		if(*col_index < table_size)
-			*col_index++;
-		break;
-	case 'A':
-		if(*col_index > 0)
-			*col_index--;
-		break;
-	default:
-		break;
-	}
-}
-
-void player_confirms(char** matr, int table_size, int *line_idx, int *col_idx, char* player1, char* player2) {
-	show_table(matr, table_size, *line_idx, *col_idx, player1);
+void player_confirms(char** matr, int table_size, int *line_idx, int *col_idx, char* player1, char* player2, int player) {
+	if(player == 0) 
+		show_table(matr, table_size, *line_idx, *col_idx, player1);
+	else
+		show_table(matr, table_size, *line_idx, *col_idx, player2);
 	int ok1 = 0, ok2 = 0;
 	char character;
-	scanf("%c\n", &character);
-	printf("CAR%c", character);
-	player_moves(line_idx, col_idx, character, table_size);
 	ok1 = 1;
-	while(character != 'X') {
-		printf("CARACTERE %d %d\n", *line_idx, *col_idx);
-		sleep(1);
-		show_table(matr, table_size, *line_idx, *col_idx, player1);
-		scanf("%c\n", &character);
-		printf("CAR%c", character);
+	getchar();
+	while(1) {
+		scanf("%c", &character);
+		if(character == ' ') {
+			if(player == 0)
+				matr[*line_idx][*col_idx] = 'X';	
+			else
+				matr[*line_idx][*col_idx] = '0';
+			break;
+		}
+		if(character >= 'a') {
+			character = character - 32;
+		}
+		switch (character)
+		{
+		case 'W':
+			if(*line_idx > 0)
+				*line_idx = *line_idx - 1;
+			break;
+		case 'S':
+			if(*line_idx < table_size - 1)
+				*line_idx = *line_idx + 1;
+			break;
+		case 'D':
+			if(*col_idx < table_size - 1)
+				*col_idx = *col_idx + 1;
+			break;
+		case 'A':
+			if(*col_idx > 0)
+				*col_idx = *col_idx - 1;
+			break;
+		default:
+			break;
+		}
+		if(player == 0) 
+			show_table(matr, table_size, *line_idx, *col_idx, player1);
+		else
+			show_table(matr, table_size, *line_idx, *col_idx, player2);
 	}
+	show_table(matr, table_size, *line_idx, *col_idx, NULL);
+}
+
+char final_message(int player, char* player1, char* player2) {
+	if(player == PlayerX_WIN)
+		printf("\n\n          Player : %s has won the game! Congratulations!", player1);
+	if(player == Player0_WIN)
+		printf("\n\n          Player : %s has won the game! Congratulations!", player2);
+	if(player == DRAW)
+		printf("\n\n          DRAW!");
+	printf("\n\n       If you want to play again press 'Q'. Press any other key to exit the game: ");
+	char choice;
+	getchar();
+	scanf("%c", &choice);
+	printf("\n");
+	return choice;
 }
 
 
