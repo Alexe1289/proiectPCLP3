@@ -1,7 +1,9 @@
+
 #include "UI.h"
 #include "logic.h"
 
 void start_message() {
+	clear();
 	printw("#########################################################################################\n");
 	printw("------------------------------------BOOTING X_0 GAME-------------------------------------\n");
 	printw("#########################################################################################\n");
@@ -121,6 +123,7 @@ void player_confirms(char** matr, int table_size, int *line_idx, int *col_idx, c
 			else {
 				printw("\n       Square already taken! ");
 				refresh();
+				napms(700);
 			}
 		}
 		if(character >= 'a') {
@@ -165,9 +168,35 @@ char final_message(int player, char* player1, char* player2) {
 	printw("\n\n       If you want to play again press 'Q'. Press any other key to exit the game: ");
 	refresh();
 	char choice;
-	getchar();
 	scanf("%c", &choice);
 	printw("\n");
 	refresh();
 	return choice;
+}
+
+void singlepl_confirmation(char* player_name, int* table_size) {
+	clear();
+	printw("#########################################################################################\n");
+	printw("#########################################################################################\n");
+	printw("#########################################################################################\n");
+	printw("---------------------------------------SINGLEPLAYER---------------------------------------\n");
+	printw("#########################################################################################\n");
+	printw("                                                                                         \n");
+	printw("               INSERT YOUR NAME (X player): ");
+	refresh();
+	getstr(player_name);
+	printw("\n");
+	printw("\n");
+	printw("               CHOOSE TABLE SIZE : ");
+	refresh();
+	scanw("%d", table_size);
+	// while ((*table_size) %  2 == 0) {
+	// 	printw("\n               BAD NUMBER, CHOOSE AGAIN(only odd numbers) : ");
+	// 	refresh();
+	// 	scanw("%d", table_size);
+	// }
+	printw("\n                         TABLE SIZE : %d\n", *table_size);
+	printw("\n                       BUILDING TABLE... \n");
+	napms(500);
+	refresh();
 }
