@@ -441,14 +441,14 @@ int hittingSurface(int TableMatrix[HEIGHT][WIDTH], int x, int y, int type, facin
                 }
                 break;
             case East:
-                for(size_t j = y; j < y + 2; j++) {
-                    if(TableMatrix[x + 4][j + 4] == 1)
+                for(size_t j = y + 4; j < y + 6; j++) {
+                    if(TableMatrix[x + 4][j ] == 1)
                         return 1;
                 }
                 break;
             case West:
-                for(size_t j = y; j < y + 2; j++) {
-                    if(TableMatrix[x + 4][j + 2] == 1)
+                for(size_t j = y + 2; j < y + 4; j++) {
+                    if(TableMatrix[x + 4][j] == 1)
                         return 1;
                 }
                 break;
@@ -463,12 +463,12 @@ int hittingSurface(int TableMatrix[HEIGHT][WIDTH], int x, int y, int type, facin
                 }
                 break;
             case East:
-                for(size_t j = y; j < y + 2; j++) {
-                    if(TableMatrix[x + 3][j + 2] == 1)
+                for(size_t j = y + 2; j < y + 4; j++) {
+                    if(TableMatrix[x + 3][j] == 1)
                         return 1;
                 }
-                for(size_t j = y + 2; j < y + 4; j++) {
-                    if(TableMatrix[x + 1][j + 2] == 1)
+                for(size_t j = y + 4; j < y + 6; j++) {
+                    if(TableMatrix[x + 1][j] == 1)
                         return 1;
                 }
                 break;
@@ -505,12 +505,12 @@ int hittingSurface(int TableMatrix[HEIGHT][WIDTH], int x, int y, int type, facin
                 }
                 break;
             case East:
-                for(size_t j = y; j < y + 2; j++) {
-                    if(TableMatrix[x + 3][j + 2] == 1)
+                for(size_t j = y + 2; j < y + 4; j++) {
+                    if(TableMatrix[x + 3][j] == 1)
                         return 1;
                 }
-                for(size_t j = y + 2; j < y + 4; j++) {
-                    if(TableMatrix[x + 2][j + 2] == 1)
+                for(size_t j = y + 4; j < y + 6; j++) {
+                    if(TableMatrix[x + 2][j] == 1)
                         return 1;
                 }
                 break;
@@ -556,13 +556,13 @@ bool isHittingLeft(int TableMatrix[HEIGHT][WIDTH],int x, int y, int type, facing
                 break;
             case East:
                 for(size_t i = x; i < x + 4; i++) {
-                    if(TableMatrix[i][y - 1 ] == 1)
+                    if(TableMatrix[i][y + 3] == 1)
                         return true;
                 }
                 break;
             case West:
                 for(size_t i = x; i < x + 4; i++) {
-                    if(TableMatrix[i][y - 1] == 1)
+                    if(TableMatrix[i][y + 1] == 1)
                         return true;
                 }
                 break;
@@ -729,7 +729,56 @@ bool isHittingRight(int TableMatrix[HEIGHT][WIDTH],int x, int y, int type, facin
     }
     return false;
 }
+
+bool isBottomFilled(int TableMatrix[HEIGHT][WIDTH]) {
+    for(size_t j = 0; j < WIDTH; j++) {
+        if (TableMatrix[HEIGHT - 2][j] == 0)
+            return false;
+    }
+    return true;
+}
+
+void clearBottom(int TableMatrix[HEIGHT][WIDTH]) {
+    for(size_t i = HEIGHT - 2; i > 0; i--)
+        for(size_t j = 0; j < WIDTH; j++)
+            TableMatrix[i][j] = TableMatrix[i - 1][j];
+}
+void printNewTable(int TableMatrix[HEIGHT][WIDTH]) {
+    for(size_t i = 0 ; i < HEIGHT - 1; i++)
+        for(size_t j = 1; j < WIDTH - 1; j++)
+            if (TableMatrix[i][j] == 1) {
+                attron(COLOR_PAIR(2));
+                mvprintw(i, j, "#");
+                attroff(COLOR_PAIR(2));
+            } else {
+                mvprintw(i, j, " ");
+            }
+    refresh();
+}
+
+int initGameplaySpeed() {
+    printf("-----SELECT GAMEPLAY SPEED-----\n");
+    printf("1. Slow\n");
+    printf("2. Normal\n");
+    printf("3. Fast\n");
+    printf("4. SuperSonic(IMPOSSIBLE)\n");
+    int getSpeed = 2;
+    int Speed = 300000;
+    scanf("%d", &getSpeed);
+    if (getSpeed == 1) {
+        Speed = 330000;
+    } else if (getSpeed == 2) {
+        Speed = 250000;
+    } else if (getSpeed == 3) {
+        Speed = 150000;
+    } else if (getSpeed == 4) {
+        Speed = 80000;
+    }
+    return Speed;
+}
+
 int main() {
+    int Speed = initGameplaySpeed(Speed);
     initscr();
     initColor();
     Pieces* piese = definePieces();
@@ -745,24 +794,28 @@ int main() {
     int max_level;
     bool shouldContinue = true;
     while (shouldContinue == true) {
+        while (isBottomFilled(TableMatrix)){
+            clearBottom(TableMatrix);
+            printNewTable(TableMatrix);
+        }
         orientaion = getOrientation();
         type = getType();
         char Piesa[8][8];
         int coord1 = 1;
         int coord2 = getCoord();
-        int ok = 0;
         int hitting = 0;
         while(!hitting) {
             hitting = hittingSurface(TableMatrix, coord1, coord2, type, orientaion);
             getPiece(TableMatrix, coord1, coord2, Piesa, type, orientaion, piese, hitting);
             printPiesa(Piesa, coord1, coord2);
+            refresh();
             if(hitting == 1 && coord1 == 1) {
                 shouldContinue = false;
                 break;
             }
             if(hitting == 1)
                 break;
-            usleep(300000);
+            usleep(Speed);
             if (hitting == 0)
                 clearAfter(coord1, coord2, type, orientaion);
             int ch = getch();
@@ -776,13 +829,13 @@ int main() {
                 case KEY_DOWN:
                     coord1++;
                     hitting = hittingSurface(TableMatrix, coord1, coord2, type, orientaion);
-                    if (hitting == 1)
-                        ok = 1;
-                    getPiece(TableMatrix, coord1, coord2, Piesa, type, orientaion, piese, ok);
+                    getPiece(TableMatrix, coord1, coord2, Piesa, type, orientaion, piese, hitting);
                     printPiesa(Piesa, coord1, coord2);
                     if(hitting == 1 && coord1 == 1) {
                         shouldContinue = false;
-                        hitting = 0;
+                        break;
+                    }
+                    if(hitting == 1) {
                         break;
                     }
                     if (hitting == 0)
@@ -808,12 +861,12 @@ int main() {
             printf("Ai pierdut!:(\n");
         }
     }
-    for (size_t i = 0; i < 24; i++) {
-        for(size_t j = 0; j < 24; j++)
-            printf("%d ", TableMatrix[i][j]);
-        printf("\n");
-    }
-    printf("type%d %d", type, orientaion);
+    // for (size_t i = 0; i < 24; i++) {
+    //     for(size_t j = 0; j < 24; j++)
+    //         printf("%d ", TableMatrix[i][j]);
+    //     printf("\n");
+    // }
+    // printf("type%d %d", type, orientaion);
         
     return 0;
 }
