@@ -35,10 +35,10 @@ Pieces* definePieces() {
 
     //---EAST---
     // Ipiece
-    strcpy(piese[1].Ipiece[0] + 4, "#");
-    strcpy(piese[1].Ipiece[1] + 4, "#");
-    strcpy(piese[1].Ipiece[2] + 4, "#");
-    strcpy(piese[1].Ipiece[3] + 4, "#");
+    strcpy(piese[1].Ipiece[0] + 4, "##");
+    strcpy(piese[1].Ipiece[1] + 4, "##");
+    strcpy(piese[1].Ipiece[2] + 4, "##");
+    strcpy(piese[1].Ipiece[3] + 4, "##");
     // Lpiece
     strcpy(piese[1].Lpiece[0] + 2, "####");
     strcpy(piese[1].Lpiece[1] + 2, "##");
@@ -66,10 +66,10 @@ Pieces* definePieces() {
 
     //---WEST---
     // Ipiece
-    strcpy(piese[3].Ipiece[0] + 2, "#");
-    strcpy(piese[3].Ipiece[1] + 2, "#");
-    strcpy(piese[3].Ipiece[2] + 2, "#");
-    strcpy(piese[3].Ipiece[3] + 2, "#");
+    strcpy(piese[3].Ipiece[0] + 2, "##");
+    strcpy(piese[3].Ipiece[1] + 2, "##");
+    strcpy(piese[3].Ipiece[2] + 2, "##");
+    strcpy(piese[3].Ipiece[3] + 2, "##");
     // Lpiece
     strcpy(piese[3].Lpiece[0] + 2, "##");
     strcpy(piese[3].Lpiece[1] + 2, "##");
@@ -91,7 +91,7 @@ typedef enum {
 void initColor(void) {
     start_color();
     init_pair(1, COLOR_MAGENTA, COLOR_BLUE);  // Bordura
-    init_pair(2, COLOR_GREEN, COLOR_GREEN);  // Piesele
+    init_pair(2, COLOR_WHITE, COLOR_WHITE);  // Piesele
 }
 
 void printBorder(void) {
@@ -135,14 +135,14 @@ void clearAfter(int x, int y, int type, facing orientation) {
                 break;
             case East:
                 for (size_t i = 0; i < 4; i++) {
-                    for (size_t j = 0; j < 1; j++) {
+                    for (size_t j = 0; j < 2; j++) {
                         mvprintw(x + i, y + j + 4, " ");
                     }
                 }
                 break;
             case West:
                 for (size_t i = 0; i < 4; i++) {
-                    for (size_t j = 0; j < 1; j++) {
+                    for (size_t j = 0; j < 2; j++) {
                         mvprintw(x + i, y + j + 2, " ");
                     }
                 }
@@ -245,12 +245,29 @@ int getType() {
 
 int getCoord() {
     srand(time(NULL));
-    return 1 + rand() % (WIDTH - 10);
+    int random = rand() % (WIDTH - 10);
+    if (random % 2) {
+        random--;
+    }
+    return 1 + random;
 }
 
 int getOrientation() {
     srand(time(NULL) + 1);
     return rand() % 4;
+}
+
+void initTable(int TableMatrix[HEIGHT][WIDTH]) {
+    for (size_t i = 0; i < HEIGHT; i++) {
+        for(size_t j = 0; j < WIDTH; j++) {
+            if (i == HEIGHT - 1)
+                TableMatrix[i][j] = 1;
+            else if (j == 0 || j == WIDTH - 1)
+                TableMatrix[i][j] = 1;
+            else
+                TableMatrix[i][j] = 0;
+        }
+    }
 }
 
 void getPiece(int TableMatrix[HEIGHT][WIDTH], int x, int y, char piesa[8][8], int type, facing orientation, Pieces* piese, int ok) {
@@ -424,13 +441,13 @@ int hittingSurface(int TableMatrix[HEIGHT][WIDTH], int x, int y, int type, facin
                 }
                 break;
             case East:
-                for(size_t j = y; j < y + 1; j++) {
+                for(size_t j = y; j < y + 2; j++) {
                     if(TableMatrix[x + 4][j + 4] == 1)
                         return 1;
                 }
                 break;
             case West:
-                for(size_t j = y; j < y + 1; j++) {
+                for(size_t j = y; j < y + 2; j++) {
                     if(TableMatrix[x + 4][j + 2] == 1)
                         return 1;
                 }
@@ -525,19 +542,199 @@ int hittingSurface(int TableMatrix[HEIGHT][WIDTH], int x, int y, int type, facin
     }
     return 0;
 }
+
+bool isHittingLeft(int TableMatrix[HEIGHT][WIDTH],int x, int y, int type, facing orientation) {
+    if(type == 0) {
+        switch(orientation) {
+            case North:
+                if(TableMatrix[x][y - 1] == 1)
+                    return true;
+                break;
+            case South:
+                if(TableMatrix[x][y - 1] == 1)
+                    return true;
+                break;
+            case East:
+                for(size_t i = x; i < x + 4; i++) {
+                    if(TableMatrix[i][y - 1 ] == 1)
+                        return true;
+                }
+                break;
+            case West:
+                for(size_t i = x; i < x + 4; i++) {
+                    if(TableMatrix[i][y - 1] == 1)
+                        return true;
+                }
+                break;
+        }
+    }
+    if(type == 1) {
+        switch(orientation) {
+            case North:
+                if(TableMatrix[x][y - 1] == 1)
+                    return true;
+                if(TableMatrix[x + 1][y - 1])
+                    return true;
+                break;
+            case East:
+                for(size_t i = x; i < x + 3; i++) {
+                    if(TableMatrix[i][y + 1] == 1)
+                        return true;
+                }
+                break;
+            case South:
+                if(TableMatrix[x][y - 1] == 1)
+                    return true;
+                if(TableMatrix[x + 1][y + 3] == 1)
+                    return true;
+                break;
+            case West:
+                for(size_t i = x; i < x + 2; i++) {
+                    if(TableMatrix[i][y + 1] == 1)
+                        return true;
+                }
+                if(TableMatrix[x + 2][y - 1] == 1)
+                        return true;
+                break;
+        }
+    }
+    if(type == 2) {
+        for (size_t i = x; i < x + 2; i++) {
+            if(TableMatrix[i][y - 1] == 1)
+                return true;
+        }
+    }
+    if(type == 3) {
+        switch(orientation) {
+            case North:
+                if(TableMatrix[x][y + 1] == 1)
+                    return true;
+                if(TableMatrix[x + 1][y - 1] == 1)
+                    return true;
+                break;
+            case East:
+                for (size_t i = x; i < x + 3; i++)
+                if(TableMatrix[i][y + 1] == 1)
+                    return true;
+                break;
+            case South:
+                if(TableMatrix[x][y - 1] == 1)
+                    return true;
+                if(TableMatrix[x + 1][y + 1] == 1)
+                    return true;
+                break;
+            case West:
+                if(TableMatrix[x][y + 1] == 1)
+                    return true;
+                if(TableMatrix[x + 2][y + 1] == 1)
+                    return true;
+                if(TableMatrix[x + 1][y - 1] == 1)
+                    return true;
+                break;
+        }
+    }
+    return false;
+}
+
+bool isHittingRight(int TableMatrix[HEIGHT][WIDTH],int x, int y, int type, facing orientation) {
+    if(type == 0) {
+        switch(orientation) {
+            case North:
+                if(TableMatrix[x][y + 8] == 1)
+                    return true;
+                break;
+            case South:
+                if(TableMatrix[x][y + 8] == 1)
+                    return true;
+                break;
+            case East:
+                for(size_t i = x; i < x + 4; i++) {
+                    if(TableMatrix[i][y + 6] == 1)
+                        return true;
+                }
+                break;
+            case West:
+                for(size_t i = x; i < x + 4; i++) {
+                    if(TableMatrix[i][y + 4] == 1)
+                        return true;
+                }
+                break;
+        }
+    }
+    if(type == 1) {
+        switch(orientation) {
+            case North:
+                if(TableMatrix[x][y + 2] == 1)
+                    return true;
+                if(TableMatrix[x + 1][y + 6])
+                    return true;
+                break;
+            case East:
+                if(TableMatrix[x][y + 6] == 1)
+                    return true;
+                for(size_t i = x + 1; i < x + 3; i++) {
+                    if(TableMatrix[i][y + 4] == 1)
+                        return true;
+                }
+                break;
+            case South:
+                for(size_t i = x; i < x + 2; i++) {
+                    if(TableMatrix[i][y + 6] == 1)
+                        return true;
+                }
+                break;
+            case West:
+                 for(size_t i = x; i < x + 3; i++) {
+                    if(TableMatrix[i][y + 4] == 1)
+                        return true;
+                }
+                break;
+        }
+    }
+    if(type == 2) {
+        for (size_t i = x; i < x + 2; i++) {
+            if(TableMatrix[i][y + 4] == 1)
+                return true;
+        }
+    }
+    if(type == 3) {
+        switch(orientation) {
+            case North:
+                if(TableMatrix[x][y + 4] == 1)
+                    return true;
+                if(TableMatrix[x + 1][y + 6] == 1)
+                    return true;
+                break;
+            case East:
+                if(TableMatrix[x][y + 4] == 1)
+                    return true;
+                if(TableMatrix[x + 2][y + 4] == 1)
+                    return true;
+                if(TableMatrix[x + 1][y + 6] == 1)
+                    return true;
+                break;
+            case South:
+                if(TableMatrix[x][y + 6] == 1)
+                    return true;
+                if(TableMatrix[x + 1][y + 4] == 1)
+                    return true;
+                break;
+            case West:
+                for (size_t i = x; i < x + 3; i++) {
+                    if(TableMatrix[i][y + 4] == 1)
+                return true;
+                }
+                break;
+        }
+    }
+    return false;
+}
 int main() {
     initscr();
     initColor();
     Pieces* piese = definePieces();
     int TableMatrix[HEIGHT][WIDTH];
-    for (size_t i = 0; i < HEIGHT; i++)
-        if(i == HEIGHT - 1) {
-            for(size_t j = 0; j < WIDTH; j++)
-            TableMatrix[i][j] = 1;
-        } else {
-            for(size_t j = 0; j < WIDTH; j++)
-                TableMatrix[i][j] = 0;
-        }
+    initTable(TableMatrix);
     cbreak();
     keypad(stdscr, TRUE);
     noecho();
@@ -557,9 +754,7 @@ int main() {
         int hitting = 0;
         while(!hitting) {
             hitting = hittingSurface(TableMatrix, coord1, coord2, type, orientaion);
-            if (hitting == 1)
-                ok = 1;
-            getPiece(TableMatrix, coord1, coord2, Piesa, type, orientaion, piese, ok);
+            getPiece(TableMatrix, coord1, coord2, Piesa, type, orientaion, piese, hitting);
             printPiesa(Piesa, coord1, coord2);
             if(hitting == 1 && coord1 == 1) {
                 shouldContinue = false;
@@ -594,12 +789,12 @@ int main() {
                         clearAfter(coord1, coord2, type, orientaion);
                     break;
                 case KEY_RIGHT:
-                    if(coord2 < (WIDTH))
-                        coord2++;
+                    if (!isHittingRight(TableMatrix, coord1 + 1, coord2, type, orientaion))
+                        coord2 += 2;
                     break;
                 case KEY_LEFT:
-                    if(coord2 > 1)
-                        coord2--;
+                    if (!isHittingLeft(TableMatrix, coord1 + 1, coord2, type, orientaion))
+                        coord2 -= 2;
                     break;
                 case 'q':
                     shouldContinue = false;
