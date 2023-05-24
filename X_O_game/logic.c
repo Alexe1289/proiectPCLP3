@@ -89,3 +89,18 @@ int check_game_state(char** matr, int table_size) {
         return DRAW;
     return CONTINUE;
 }
+
+Tree createTree(int line_idx, int col_idx, char player, int table_size, char** matr) {
+    Tree root = calloc(1, sizeof(struct tree));
+    root->gamestate = check_game_state(matr, table_size);
+    if(root->gamestate == CONTINUE) {
+        root->matrix = malloc(table_size * sizeof(char*));
+            for(int i = 0; i < table_size; i++) {
+                root->matrix[i] = malloc(table_size * sizeof(char));
+            }
+        for(int i = 0; i < table_size; i++) {
+            for(int j = 0; j < table_size; j++)
+                root->matrix[i][j] = matr [i][j];
+        }
+    }
+}

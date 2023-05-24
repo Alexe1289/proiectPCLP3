@@ -5,8 +5,11 @@
 #include "logic.h"
 
 int main() {
+	initscr();
+	keypad(stdscr, TRUE);
 	start_message();
-	char player_choice = getchar();
+	char player_choice;
+	scanw("%c", &player_choice);
 	char continue_game = 0;
 	if(player_choice == '2') {
 		do {
@@ -42,7 +45,9 @@ int main() {
 				break;
 			}
 		} while (1);
-		} while (continue_game == 'Q');
+		printw("%c", continue_game);
+		} while (continue_game == 'Q' || continue_game == 'q');
 	}
+	endwin();
 	return 0;
 }

@@ -1,7 +1,7 @@
 CFLAGS=-Wall -g
 all: build
 build: X_O.o user_interface.o logic.o
-	gcc $(CFLAGS) -o X_O X_O.o user_interface.o logic.o
+	gcc $(CFLAGS) -o X_O X_O.o user_interface.o logic.o -lcurses
 
 main.o: X_O.c
 	gcc $(CFLAGS) -c X_O.c
