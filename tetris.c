@@ -799,14 +799,12 @@ void freePieces(Pieces* piese) {
     return;
 }
 
-<<<<<<< HEAD
 extern void tetris() {
-=======
-int main() {
->>>>>>> robertos
     system("clear");
-    int Speed = initGameplaySpeed(Speed);
+    int Speed = 0;
+    Speed = initGameplaySpeed(Speed);
     initscr();
+    curs_set(0);
     initColor();
     Pieces* piese = definePieces();
     int TableMatrix[HEIGHT][WIDTH];
@@ -901,9 +899,5 @@ int main() {
             printf("\n\tAi pierdut!:(\n\n\tScorul tau: %d\n\n", score);
         }
     }
-<<<<<<< HEAD
     return ;
-=======
-    return 0;
->>>>>>> robertos
 }

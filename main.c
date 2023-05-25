@@ -6,7 +6,9 @@
 #define ALLOC(t,n) (t *) malloc((n)*sizeof(t))
 
 extern void Tic_Tac_Toe();
+extern void tetris();
 
 int main() {
-    Tic_Tac_Toe();
+    tetris();
+    return 0;
 }
