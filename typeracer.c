@@ -56,13 +56,19 @@ void printLoadingBar(char loading_bar[]) {
     clrtoeol();
     mvprintw(9, 0, "[%s]", loading_bar);
     refresh();
+<<<<<<< HEAD
     return;
+=======
+>>>>>>> robertos
 }
 
 void printSpeed(double speed) {
     mvprintw(12, 0, "Caractere pe secunda: %.2f", speed);
     refresh();
+<<<<<<< HEAD
     return;
+=======
+>>>>>>> robertos
 }
 
 void printTimeLeft(int TimeLeft) {
@@ -73,10 +79,16 @@ void printTimeLeft(int TimeLeft) {
 void moveCursorInput(int charactersFilled) {
     move(6, 7 + charactersFilled);
     refresh();
+<<<<<<< HEAD
     return;
 }
 
 extern void typeRacer() {
+=======
+}
+
+int main() {
+>>>>>>> robertos
     bool WINSTATE = false;
     char progress[MAX_LEN];
     char text[MAX_LEN];
@@ -153,5 +165,9 @@ extern void typeRacer() {
         printf("\n-----Din pacate ai pierdut! Quicker next time!-----\n");
     }
     printf("\n-----Caractere pe secunda: %.2f-----\n\n", speed);
+<<<<<<< HEAD
     return ;
+=======
+    return 0;
+>>>>>>> robertos
 }
