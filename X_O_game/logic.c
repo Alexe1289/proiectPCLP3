@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <time.h>
 #include <ncurses.h>
 #include "logic.h"
 #include <stdlib.h>
