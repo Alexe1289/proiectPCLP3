@@ -77,7 +77,7 @@ void moveCursorInput(int charactersFilled) {
 }
 
 extern void typeRacer() {
-    bool WINSTATE = false;
+    int WINSTATE = 0;
     char progress[MAX_LEN];
     char text[MAX_LEN];
     char loading_bar[MAX_LEN];
@@ -91,6 +91,7 @@ extern void typeRacer() {
     int TimeLeft = (strlen(text) / 4);
     printTimeLeft(TimeLeft);
     unsigned int charactersFilled = 0;
+    unsigned int charactersRead = 0;
     moveCursorInput(charactersFilled);
     clock_t start = time(NULL), end, countdowninit;
     countdowninit = start;
@@ -104,50 +105,61 @@ extern void typeRacer() {
             countdowninit = current;
         }
         printTimeLeft(TimeLeft);
-        moveCursorInput(charactersFilled);
+        moveCursorInput(charactersRead);
         clrtoeol();
         usleep(100000);
+        int ok = 1;
         int ch = getch();
         if (ch == KEY_BACKSPACE || ch == 127) {
             if (charactersFilled > 0) {
-                moveCursorInput(charactersFilled - 1);
+                moveCursorInput(charactersRead - 1);
                 clrtoeol();
-                if(position != 0 && progress[charactersFilled - 1] == text[charactersFilled - 1] && charactersFilled % 2) {
-                    loading_bar[position - 1] = '.';
-                    position--;
+                if(position != 0 && progress[charactersFilled - 1] == text[charactersFilled - 1] && charactersRead == charactersFilled) {
+                    if ((charactersFilled % 2)) {
+                        loading_bar[position - 1] = '.';
+                        position--;
+                    }
+                    ok = 1;
+                    progress[charactersFilled - 1] = '\0';
+                    charactersFilled--;
                 }
                 printLoadingBar(loading_bar);
-                progress[charactersFilled - 1] = '\0';
                 end = time(NULL);
-                charactersFilled--;
                 if(charactersFilled != 0)
                     speed = (double)(end - start) / charactersFilled;
                 printSpeed(speed);
+                charactersRead--;
             }
         } else if ((charactersFilled < strlen(text)) && ch >= 32 && ch <= 127) {
-            if(ch == text[charactersFilled] && charactersFilled % 2) {
+            if(ch == text[charactersFilled] && charactersFilled % 2 && ok == 1) {
                 loading_bar[position] = '#';
                 position++;
+            } else if (ch != text[charactersFilled]) {
+                ok = 0;
             }
-            if(ch == text[charactersFilled])
+            if(ch == text[charactersFilled]) {
+                progress[charactersFilled] = ch;
+                progress[charactersFilled + 1] = '\0';
+                charactersFilled++;
+            }
             printLoadingBar(loading_bar);
-            progress[charactersFilled] = ch;
-            progress[charactersFilled + 1] = '\0';
-            charactersFilled++;
             end = time(NULL);
             if(charactersFilled != 0)
                 speed = (double)(end - start) / charactersFilled;
             printSpeed(speed);
-            if(charactersFilled == strlen(text)) {
-                WINSTATE = true;
+            if(charactersFilled == strlen(text) && strcmp(progress, text) == 0) {
+                WINSTATE = 1;
                 break;
             }
+            charactersRead++;
+        } else if (charactersFilled == strlen(text)) {
+            break;
         }
     }
     clear();
     endwin();
     system("clear");
-    if (WINSTATE == true) {
+    if (WINSTATE) {
         printf("\n-----Felicitari! Ai fost rapid!-----\n");
     } else {
         printf("\n-----Din pacate ai pierdut! Quicker next time!-----\n");
