@@ -17,6 +17,10 @@ typedef struct {
     char Tpiece[8][8];
 }Pieces;
 
+typedef enum {
+    North, East, South, West
+}facing;
+
 Pieces* definePieces() {
     Pieces* piese = (Pieces*) malloc (SIDES * sizeof(Pieces));
 
@@ -83,10 +87,6 @@ Pieces* definePieces() {
     strcpy(piese[3].Tpiece[2] + 2, "##");
     return piese;
 }
-
-typedef enum {
-    North, East, South, West
-}facing;
 
 void initColor(void) {
     start_color();
@@ -794,6 +794,11 @@ int initGameplaySpeed() {
     return Speed;
 }
 
+void freePieces(Pieces* piese) {
+    free(piese);
+    return;
+}
+
 int main() {
     system("clear");
     int Speed = initGameplaySpeed(Speed);
@@ -804,8 +809,8 @@ int main() {
     initTable(TableMatrix);
     cbreak();
     keypad(stdscr, TRUE);
-    noecho();
     nodelay(stdscr, TRUE);
+    noecho();
     printBorder();
     int score = 0;
     printScore(score);
@@ -886,9 +891,10 @@ int main() {
             coord1++;
         }
         if(shouldContinue == false) {
+            freePieces(piese);
             endwin();
             system("clear");
-            printf("\n\tAi pierdut!:(\n\n");
+            printf("\n\tAi pierdut!:(\n\n\tScorul tau: %d\n\n", score);
         }
     }
     return 0;
