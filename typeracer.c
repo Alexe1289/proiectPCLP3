@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <curses.h>
 #include <time.h>
+#include <unistd.h>
 
 #define MAX_LEN 1000
 #define TOTAL_LINES 17
@@ -56,37 +58,52 @@ void printLoadingBar(char loading_bar[]) {
 }
 
 void printSpeed(double speed) {
-    move(12, 0);
     mvprintw(12, 0, "Caractere pe secunda: %.2f", speed);
+    refresh();
+}
+
+void printTimeLeft(int TimeLeft) {
+    mvprintw(12, 30, "Timp ramas: %d secunde", TimeLeft);
     refresh();
 }
 
 void moveCursorInput(int charactersFilled) {
     move(6, 7 + charactersFilled);
-    move(6, 7 + charactersFilled);
     refresh();
 }
 
 int main() {
+    bool WINSTATE = false;
     char progress[MAX_LEN];
     char text[MAX_LEN];
     char loading_bar[MAX_LEN];
     getText(text);
     int size = (strlen(text) / 2);
     initDisplay(text);
-    refresh();
     initLoadingbar(loading_bar, size);
     printLoadingBar(loading_bar);
     double speed = 0.0;
     printSpeed(speed);
+    int TimeLeft = (strlen(text) / 5);
+    printTimeLeft(TimeLeft);
     unsigned int charactersFilled = 0;
     moveCursorInput(charactersFilled);
-    clock_t start = time(NULL), end;
+    clock_t start = time(NULL), end, countdowninit;
+    countdowninit = start;
+    timeout(0);
     // move cursor at input block
     unsigned int position = 0;
-    while (1) {
+    while (TimeLeft > 0) {
+        time_t current = time(NULL);
+        int elapsed = difftime(current, countdowninit);
+        if (elapsed >= 1) {
+            TimeLeft--;
+            countdowninit = current;
+        }
+        printTimeLeft(TimeLeft);
         moveCursorInput(charactersFilled);
         clrtoeol();
+        usleep(100000);
         int ch = getch();
         if (ch == KEY_BACKSPACE || ch == 127) {
             if (charactersFilled > 0) {
@@ -104,7 +121,7 @@ int main() {
                     speed = (double)(end - start) / charactersFilled;
                 printSpeed(speed);
             }
-        } else if ((charactersFilled < strlen(text) - 1)) {
+        } else if ((charactersFilled < strlen(text)) && ch >= 32 && ch <= 127) {
             if(ch == text[charactersFilled] && charactersFilled % 2) {
                 loading_bar[position] = '#';
                 position++;
@@ -118,13 +135,20 @@ int main() {
             if(charactersFilled != 0)
                 speed = (double)(end - start) / charactersFilled;
             printSpeed(speed);
-            if(charactersFilled == strlen(text))
+            if(charactersFilled == strlen(text)) {
+                WINSTATE = true;
                 break;
-        } else {
-            break;
+            }
         }
     }
+    clear();
     endwin();
+    system("clear");
+    if (WINSTATE == true) {
+        printf("\n-----Felicitari! Ai fost rapid!-----\n");
+    } else {
+        printf("\n-----Din pacate ai pierdut! Quicker next time!-----\n");
+    }
     printf("\n-----Caractere pe secunda: %.2f-----\n\n", speed);
     return 0;
 }
