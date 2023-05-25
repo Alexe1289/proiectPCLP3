@@ -7,7 +7,7 @@
 #include <unistd.h>
 
 #define MAX_LEN 1000
-#define TOTAL_LINES 17
+#define TOTAL_LINES 30
 
 void initDisplay(char text[]) {
     initscr();
@@ -19,7 +19,7 @@ void initDisplay(char text[]) {
 
 int randomLine() {
     srand(time(NULL));
-    return rand() % TOTAL_LINES;
+    return rand() % TOTAL_LINES - 1;
 }
 
 void getText(char text[]) {
@@ -39,6 +39,7 @@ void getText(char text[]) {
         ch = fgetc(fin);
     }
     text[position] = '\0';
+    fclose(fin);
     return;
 }
 
@@ -91,7 +92,6 @@ int main() {
     clock_t start = time(NULL), end, countdowninit;
     countdowninit = start;
     timeout(0);
-    // move cursor at input block
     unsigned int position = 0;
     while (TimeLeft > 0) {
         time_t current = time(NULL);
