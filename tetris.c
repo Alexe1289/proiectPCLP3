@@ -92,6 +92,7 @@ void initColor(void) {
     start_color();
     init_pair(1, COLOR_MAGENTA, COLOR_BLUE);  // Bordura
     init_pair(2, COLOR_WHITE, COLOR_WHITE);  // Piesele
+    init_pair(3, COLOR_GREEN, COLOR_GREEN);  // Scorul
 }
 
 void printBorder(void) {
@@ -116,6 +117,22 @@ void printPiesa(char piesa[8][8], int x, int y) {
     attroff(COLOR_PAIR(2));
     refresh();
 }
+
+void printScore(int score) {
+    attron(COLOR_PAIR(3));
+    mvhline(HEIGHT / 2 - 3, WIDTH + 8, ACS_DIAMOND, 10);
+    mvvline(HEIGHT / 2 - 3, WIDTH + 8, ACS_DIAMOND, 6);
+    mvvline(HEIGHT / 2 - 3, WIDTH + 7, ACS_DIAMOND, 6);
+    mvhline(HEIGHT / 2 + 2, WIDTH + 8, ACS_DIAMOND, 10);
+    mvvline(HEIGHT / 2 - 3, WIDTH + 18, ACS_DIAMOND, 6);
+    mvvline(HEIGHT / 2 - 3, WIDTH + 19, ACS_DIAMOND, 6);
+    attroff(COLOR_PAIR(3));
+    mvprintw(HEIGHT / 2 - 2, WIDTH + 11, "SCORE");
+    mvprintw(HEIGHT / 2, WIDTH + 10, "%d", score);
+    refresh();
+    return;
+}
+
 void clearAfter(int x, int y, int type, facing orientation) {
     if(type == 0) {
         switch (orientation) {
@@ -739,12 +756,12 @@ bool isBottomFilled(int TableMatrix[HEIGHT][WIDTH]) {
 }
 
 void clearBottom(int TableMatrix[HEIGHT][WIDTH]) {
-    for(size_t i = HEIGHT - 2; i > 0; i--)
+    for(size_t i = HEIGHT - 2; i > 1; i--)
         for(size_t j = 0; j < WIDTH; j++)
             TableMatrix[i][j] = TableMatrix[i - 1][j];
 }
 void printNewTable(int TableMatrix[HEIGHT][WIDTH]) {
-    for(size_t i = 0 ; i < HEIGHT - 1; i++)
+    for(size_t i = 1 ; i < HEIGHT - 1; i++)
         for(size_t j = 1; j < WIDTH - 1; j++)
             if (TableMatrix[i][j] == 1) {
                 attron(COLOR_PAIR(2));
@@ -757,11 +774,11 @@ void printNewTable(int TableMatrix[HEIGHT][WIDTH]) {
 }
 
 int initGameplaySpeed() {
-    printf("-----SELECT GAMEPLAY SPEED-----\n");
-    printf("1. Slow\n");
-    printf("2. Normal\n");
-    printf("3. Fast\n");
-    printf("4. SuperSonic(IMPOSSIBLE)\n");
+    printf("\t\t-----SELECT GAMEPLAY SPEED-----\n\n");
+    printf("\t1. Slow\n\n");
+    printf("\t2. Normal\n\n");
+    printf("\t3. Fast\n\n");
+    printf("\t4. SuperSonic(IMPOSSIBLE)\n");
     int getSpeed = 2;
     int Speed = 300000;
     scanf("%d", &getSpeed);
@@ -778,6 +795,7 @@ int initGameplaySpeed() {
 }
 
 int main() {
+    system("clear");
     int Speed = initGameplaySpeed(Speed);
     initscr();
     initColor();
@@ -789,14 +807,17 @@ int main() {
     noecho();
     nodelay(stdscr, TRUE);
     printBorder();
+    int score = 0;
+    printScore(score);
     int type;
     facing orientaion;
-    int max_level;
     bool shouldContinue = true;
     while (shouldContinue == true) {
         while (isBottomFilled(TableMatrix)){
             clearBottom(TableMatrix);
             printNewTable(TableMatrix);
+            score += 100;
+            printScore(score);
         }
         orientaion = getOrientation();
         type = getType();
@@ -813,8 +834,11 @@ int main() {
                 shouldContinue = false;
                 break;
             }
-            if(hitting == 1)
+            if(hitting == 1) {
+                score += 10;
+                printScore(score);
                 break;
+            }
             usleep(Speed);
             if (hitting == 0)
                 clearAfter(coord1, coord2, type, orientaion);
@@ -836,11 +860,16 @@ int main() {
                         break;
                     }
                     if(hitting == 1) {
+                        score += 10;
+                        printScore(score);
                         break;
                     }
-                    if (hitting == 0)
+                    if (hitting == 0) {
+                        score += 5;
+                        printScore(score);
                         clearAfter(coord1, coord2, type, orientaion);
-                    break;
+                        break;
+                    }
                 case KEY_RIGHT:
                     if (!isHittingRight(TableMatrix, coord1 + 1, coord2, type, orientaion))
                         coord2 += 2;
@@ -858,15 +887,9 @@ int main() {
         }
         if(shouldContinue == false) {
             endwin();
-            printf("Ai pierdut!:(\n");
+            system("clear");
+            printf("\n\tAi pierdut!:(\n\n");
         }
     }
-    // for (size_t i = 0; i < 24; i++) {
-    //     for(size_t j = 0; j < 24; j++)
-    //         printf("%d ", TableMatrix[i][j]);
-    //     printf("\n");
-    // }
-    // printf("type%d %d", type, orientaion);
-        
     return 0;
 }
