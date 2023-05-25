@@ -92,6 +92,27 @@ int check_game_state(char** matr, int table_size) {
 	return CONTINUE;
 }
 
+Coords find_best0_pos(char** matr, int table_size) {
+	Coords idxs;
+	idxs.line_idx = -1;
+	idxs.col_idx = -1;
+	for(int i = 0; i < table_size; i++) {
+		for(int j = 0; j < table_size; j++)
+			if(matr[i][j] == ' ') {
+				matr[i][j] = '0'; //check if putting X here influences the game
+				if(check_game_state(matr, table_size) == Player0_WIN) {
+					Coords idxs;
+					idxs.line_idx = i;
+					idxs.col_idx = j;
+					matr[i][j] = ' '; //revert the change
+					return idxs;
+				}
+				matr[i][j] = ' '; //revert the change
+			}
+	}
+	return idxs;
+}
+
 Coords find_bestX_pos(char** matr, int table_size) {
 	Coords idxs;
 	idxs.line_idx = -1;
@@ -127,5 +148,13 @@ Coords pick_a_random_pos(char** matr, int table_size) {
 	srand(time(NULL));
 	int random_idx = rand() % k;
 	return free_idxs[random_idx];
+}
+
+char** free_matrix(char** matr, int table_size) {
+	for(int i = 0; i < table_size; i++) {
+			free(matr[i]);
+	}
+	free(matr);
+	return NULL;
 }
 

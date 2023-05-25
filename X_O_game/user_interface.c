@@ -1,11 +1,12 @@
 #include <ncurses.h>
+#include <string.h>
 #include "UI.h"
 #include "logic.h"
 
 void start_message() {
 	clear();
 	printw("#########################################################################################\n");
-	printw("------------------------------------BOOTING X_0 GAME-------------------------------------\n");
+	printw("-----------------------------------------------------------------------------------------\n");
 	printw("#########################################################################################\n");
 	//sleep(1);
 	// Wait for a key press
@@ -18,7 +19,9 @@ void start_message() {
 	printw("                                                                                         \n");
 	printw("                                    2) MULTIPLAYER\n");
 	printw("                                                                                         \n");
-	printw("                                    Press '1' or '2' : ");
+	printw("                                    3) AI vs AI\n");
+	printw("                                                                                         \n");
+	printw("                                    Press '1' or '2' or '3' : ");
 	refresh();
 }
 
@@ -42,11 +45,6 @@ void multipl_confirmation(char* first_player_name, char* second_player_name, int
 	printw("               CHOOSE TABLE SIZE : ");
 	refresh();
 	scanw("%d", table_size);
-	// while ((*table_size) %  2 == 0) {
-	// 	printw("\n               BAD NUMBER, CHOOSE AGAIN(only odd numbers) : ");
-	// 	refresh();
-	// 	scanw("%d", table_size);
-	// }
 	printw("\n                         TABLE SIZE : %d\n", *table_size);
 	printw("\n                       BUILDING TABLE... \n");
 	napms(500);
@@ -54,16 +52,17 @@ void multipl_confirmation(char* first_player_name, char* second_player_name, int
 }
 
 void show_table(char** matr, int table_size, int line_idx, int col_idx, char* player) {
+	start_color();
 	clear();
 	if(player != NULL) {
-		printw("\n      Player %s chooses:\n\n", player);
+		printw("\n            Player %s chooses:\n\n", player);
 		if(strcmp(player, "computer") != 0) {
-			printw("     To move use WASD. After deciding press ENTER.\n");
+			printw("         To move use WASD. After deciding press ENTER.\n");
 			refresh();
 		}
 	}
-	printw("\n      ");
-	printw("\n      ");
+	printw("\n");
+	printw("\n                      ");
 	int ok1 = 0;
 	for(int i = 0; i < table_size; i++) {
 		ok1 = 0;
@@ -76,20 +75,22 @@ void show_table(char** matr, int table_size, int line_idx, int col_idx, char* pl
 				printw("----");
 		}
 		if(ok1 == 0)
-			printw("-\n      ");
+			printw("-\n                      ");
 		else
-			printw("\n      ");
+			printw("\n                      ");
 		for(int k = 0; k < table_size; k++) {
-			if(line_idx == i && (col_idx == k || col_idx + 1 == k))
+			if(line_idx == i && (col_idx == k || col_idx + 1 == k)) {
 				printw("# %c ", matr[i][k]);
+			}
 			else
 				printw("| %c ", matr[i][k]);
 		}
-		if(line_idx == i && col_idx == table_size - 1) 
+		if(line_idx == i && col_idx == table_size - 1) {
 			printw("#");
+		}
 		else
 			printw("|");
-		printw("\n      ");
+		printw("\n                      ");
 	}
 	for(int k = 0; k < table_size; k++) {
 		if(line_idx == table_size - 1 && col_idx == k) {
@@ -113,6 +114,7 @@ void player_confirms(char** matr, int table_size, int *line_idx, int *col_idx, c
 	char character;
 	while(1) {
 		noecho();
+		curs_set(0);
 		character = getch();
 		if(character == '\n') {
 			if(matr[*line_idx][*col_idx] == ' ') {
@@ -128,7 +130,7 @@ void player_confirms(char** matr, int table_size, int *line_idx, int *col_idx, c
 				napms(700);
 			}
 		}
-		if(character >= 'a') {
+		if(character >= 'a') { //conversion to UPPER CASE
 			character = character - 32;
 		}
 		switch (character)
@@ -162,15 +164,16 @@ void player_confirms(char** matr, int table_size, int *line_idx, int *col_idx, c
 
 char final_message(int player, char* player1, char* player2) {
 	if(player == PlayerX_WIN)
-		printw("\n\n          Player : %s has won the game! Congratulations!", player1);
+		printw("\n\n                 Player : %s has won the game! Congratulations!", player1);
 	if(player == Player0_WIN)
-		printw("\n\n          Player : %s has won the game! Congratulations!", player2);
+		printw("\n\n                 Player : %s has won the game! Congratulations!", player2);
 	if(player == DRAW)
-		printw("\n\n          DRAW!");
+		printw("\n\n                 DRAW!");
 	printw("\n\n       If you want to play again press 'Q'. Press any other key to exit the game: ");
 	refresh();
+	napms(700);
 	char choice;
-	scanf("%c", &choice);
+	choice = getch();
 	printw("\n");
 	refresh();
 	return choice;

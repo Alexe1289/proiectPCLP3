@@ -13,4 +13,6 @@ typedef struct coordinates {
 
 int check_game_state(char** matr, int table_size);
 Coords find_bestX_pos(char** matr, int table_size);
+Coords find_best0_pos(char** matr, int table_size);
 Coords pick_a_random_pos(char** matr, int table_size);
+char** free_matrix(char** matr, int table_size);
