@@ -88,7 +88,7 @@ extern void typeRacer() {
     printLoadingBar(loading_bar);
     double speed = 0.0;
     printSpeed(speed);
-    int TimeLeft = (strlen(text) / 5);
+    int TimeLeft = (strlen(text) / 4);
     printTimeLeft(TimeLeft);
     unsigned int charactersFilled = 0;
     moveCursorInput(charactersFilled);
