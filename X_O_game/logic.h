@@ -4,21 +4,13 @@
 #define DRAW 2
 #define PlayerX_WIN 0
 #define Player0_WIN 1
+#define RANDOM -1
+#define Square(n) n * n
+
+typedef struct coordinates {
+    int line_idx, col_idx;
+} Coords;
 
 int check_game_state(char** matr, int table_size);
-
-typedef struct coord {
-    int line_idx, col_idx, i;
-}Location;
-
-typedef struct tree {
-    struct tree** sibling;
-    int gamestate;
-    char** matrix;
-    Location coords;
-    char value;
-}*Tree;
-
-Tree createTree(int line_idx, int col_idx, char player, int table_size, char** matr);
-Location get_AI_choice(Tree root, int table_size);
-
+Coords find_bestX_pos(char** matr, int table_size);
+Coords pick_a_random_pos(char** matr, int table_size);

@@ -1,4 +1,4 @@
-
+#include <ncurses.h>
 #include "UI.h"
 #include "logic.h"
 
@@ -57,8 +57,10 @@ void show_table(char** matr, int table_size, int line_idx, int col_idx, char* pl
 	clear();
 	if(player != NULL) {
 		printw("\n      Player %s chooses:\n\n", player);
-		printw("     To move use WASD. After deciding press ENTER.\n");
-		refresh();
+		if(strcmp(player, "computer") != 0) {
+			printw("     To move use WASD. After deciding press ENTER.\n");
+			refresh();
+		}
 	}
 	printw("\n      ");
 	printw("\n      ");
@@ -179,7 +181,7 @@ void singlepl_confirmation(char* player_name, int* table_size) {
 	printw("#########################################################################################\n");
 	printw("#########################################################################################\n");
 	printw("#########################################################################################\n");
-	printw("---------------------------------------SINGLEPLAYER---------------------------------------\n");
+	printw("---------------------------------------SINGLEPLAYER--------------------------------------\n");
 	printw("#########################################################################################\n");
 	printw("                                                                                         \n");
 	printw("               INSERT YOUR NAME (X player): ");

@@ -1,3 +1,4 @@
+#include <ncurses.h>
 #include "logic.h"
 #include <stdlib.h>
 
@@ -91,67 +92,40 @@ int check_game_state(char** matr, int table_size) {
 	return CONTINUE;
 }
 
-Tree createTree(int line_idx, int col_idx, char player, int table_size, char** matr) {
-	Tree root = calloc(1, sizeof(struct tree));
-	root->matrix = malloc(table_size * sizeof(char*)); //matrix allocation
-	for(int i = 0; i < table_size; i++) {
-		root->matrix[i] = malloc(table_size * sizeof(char));
-	}
+Coords find_bestX_pos(char** matr, int table_size) {
+	Coords idxs;
+	idxs.line_idx = -1;
+	idxs.col_idx = -1;
 	for(int i = 0; i < table_size; i++) {
 		for(int j = 0; j < table_size; j++)
-			root->matrix[i][j] = matr[i][j];
-	}
-	root->sibling = calloc(table_size, sizeof(struct tree*)); //siblings allocation
-	root->matrix[line_idx][col_idx] = player;
-	root->coords.line_idx = line_idx;
-	root->coords.col_idx = col_idx;
-	root->value = player;
-	root->gamestate = check_game_state(root->matrix, table_size);
-	printw("\nGame creation: %d\n", root->gamestate);
-	refresh();
-	int k = 0;
-	if(root->gamestate == CONTINUE) {
-		for(int i = 0; i < table_size; i++) {
-			for(int j = 0; j < table_size; j++)
-				if(root->matrix[i][j] == ' ') {//children allocation
-					if(player == 'X')
-						root->sibling[k++] = createTree(i, j, '0', table_size, root->matrix);
-					else
-						root->sibling[k++] = createTree(i, j, 'X', table_size, root->matrix);
+			if(matr[i][j] == ' ') {
+				matr[i][j] = 'X'; //check if putting X here influences the game
+				if(check_game_state(matr, table_size) == PlayerX_WIN) {
+					Coords idxs;
+					idxs.line_idx = i;
+					idxs.col_idx = j;
+					matr[i][j] = ' '; //revert the change
+					return idxs;
 				}
-		}
-	}
-	return root;
-}
-
-int recursion_parc(Tree root, int table_size) {
-	if(root == NULL)
-		return -1;
-	if(root->gamestate == Player0_WIN)
-		return Player0_WIN;
-	if(root->gamestate == DRAW)
-		return DRAW;
-	if(root->sibling == NULL)
-		return -1;
-	int gamestate = -1;
-	for(int i = 0; i < table_size; i++) {
-		gamestate = recursion_parc(root->sibling[i], table_size);
-	}
-	return gamestate;
-}
-
-Location get_AI_choice(Tree root, int table_size) {
-	int game_state;
-	for(int i = 0; i < table_size; i++) {
-		if(root->sibling[i] != NULL) {
-			game_state = recursion_parc(root->sibling[i], table_size);
-			printw("\nGame creation: %d\n", root->gamestate);
-			if(game_state == Player0_WIN) {
-				return root->sibling[i]->coords; //if it finds a good spot, it instantly returns it.
+				matr[i][j] = ' '; //revert the change
 			}
-			if(game_state == DRAW)
-				return root->sibling[i]->coords;
+	}
+	return idxs;
+}
+
+Coords pick_a_random_pos(char** matr, int table_size) {
+	Coords free_idxs[Square(table_size)];
+	int k = 0;
+	for(int i = 0; i < table_size; i++) {
+		for(int j = 0; j < table_size; j++) {
+			if(matr[i][j] == ' ') {
+				free_idxs[k].line_idx = i;
+				free_idxs[k++].col_idx = j;
+		}
 		}
 	}
-	return root->sibling[0]->coords;
+	srand(time(NULL));
+	int random_idx = rand() % k;
+	return free_idxs[random_idx];
 }
+
