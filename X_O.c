@@ -363,11 +363,6 @@ void singlepl_confirmation(char* player_name, int* table_size) {
 	printw("               CHOOSE TABLE SIZE : ");
 	refresh();
 	scanw("%d", table_size);
-	// while ((*table_size) %  2 == 0) {
-	// 	printw("\n               BAD NUMBER, CHOOSE AGAIN(only odd numbers) : ");
-	// 	refresh();
-	// 	scanw("%d", table_size);
-	// }
 	printw("\n                         TABLE SIZE : %d\n", *table_size);
 	printw("\n                       BUILDING TABLE... \n");
 	napms(500);
@@ -418,42 +413,42 @@ extern void Tic_Tac_Toe() {
 		} while (continue_game == 'Q' || continue_game == 'q');
 	}
 	else if(player_choice == '1') {
-		char player_name[20];
-		int ok = 0;
-		singlepl_confirmation(player_name, &table_size);
-		int mid_pos = table_size / 2;
-		int line_idx = mid_pos, col_idx = mid_pos;
-		char **matr = malloc(table_size * sizeof(char*));
-		for(int i = 0; i < table_size; i++) {
-			matr[i] = malloc(table_size * sizeof(char));
-		}
-		for(int i = 0; i < table_size; i++) {
-			for(int j = 0; j < table_size; j++) {
-				matr[i][j] = ' '; //matrix is empty initially
+		do {
+			char player_name[20];
+			int ok = 0;
+			singlepl_confirmation(player_name, &table_size);
+			int mid_pos = table_size / 2;
+			int line_idx = mid_pos, col_idx = mid_pos;
+			char **matr =ALLOC(char*, table_size);
+			for(int i = 0; i < table_size; i++) {
+				matr[i] = ALLOC(char, table_size);
 			}
-		}
-		do {
-		do {
-		player_confirms(matr, table_size, &line_idx, &col_idx, player_name, "computer", ok); //here player makes a choice
-		int game_state = check_game_state(matr, table_size);
-		if(game_state != CONTINUE) {
-			continue_game = final_message(game_state, player_name, "computer");
-			break;
-		}
-		Coords locations;
-		locations = find_best0_pos(matr, table_size);
-		locations = find_bestX_pos(matr, table_size);
-		if(locations.col_idx == -1) { //if the player didn't make a game-ending decision, then pick a random position
-			locations = pick_a_random_pos(matr, table_size);
-		}
-		matr[locations.line_idx][locations.col_idx] = '0';
-		show_table(matr, table_size, locations.line_idx, locations.col_idx, "computer");
-		game_state = check_game_state(matr, table_size);
-		if(game_state != CONTINUE) {
-			continue_game = final_message(game_state, player_name, "computer");
-			break;
-		}
-		} while (1);
+			for(int i = 0; i < table_size; i++) {
+				for(int j = 0; j < table_size; j++) {
+					matr[i][j] = ' '; //matrix is empty initially
+				}
+			}
+			do {
+			player_confirms(matr, table_size, &line_idx, &col_idx, player_name, "computer", ok); //here player makes a choice
+			int game_state = check_game_state(matr, table_size);
+			if(game_state != CONTINUE) {
+				continue_game = final_message(game_state, player_name, "computer");
+				break;
+			}
+			Coords locations;
+			locations = find_best0_pos(matr, table_size);
+			locations = find_bestX_pos(matr, table_size);
+			if(locations.col_idx == -1) { //if the player didn't make a game-ending decision, then pick a random position
+				locations = pick_a_random_pos(matr, table_size);
+			}
+			matr[locations.line_idx][locations.col_idx] = '0';
+			show_table(matr, table_size, locations.line_idx, locations.col_idx, "computer");
+			game_state = check_game_state(matr, table_size);
+			if(game_state != CONTINUE) {
+				continue_game = final_message(game_state, player_name, "computer");
+				break;
+			}
+			} while (1);
 		matr = free_matrix(matr, table_size);
 		} while(continue_game == 'Q' || continue_game == 'q');
 		}
@@ -463,9 +458,9 @@ extern void Tic_Tac_Toe() {
 		printw("-----------------INSERT TABLE SIZE : ");
 		scanw("%d", &table_size);
 		do {
-		char **matr = malloc(table_size * sizeof(char*));
+		char **matr = ALLOC(char*, table_size);
 		for(int i = 0; i < table_size; i++) {
-			matr[i] = malloc(table_size * sizeof(char));
+			matr[i] = ALLOC(char, table_size);
 		}
 		for(int i = 0; i < table_size; i++) {
 			for(int j = 0; j < table_size; j++) {
