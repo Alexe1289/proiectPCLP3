@@ -111,7 +111,7 @@ extern void typeRacer() {
         int ok = 1;
         int ch = getch();
         if (ch == KEY_BACKSPACE || ch == 127) {
-            if (charactersFilled > 0) {
+            if (charactersFilled > 0 && charactersRead > 0) {
                 moveCursorInput(charactersRead - 1);
                 clrtoeol();
                 if(position != 0 && progress[charactersFilled - 1] == text[charactersFilled - 1] && charactersRead == charactersFilled) {
@@ -124,9 +124,6 @@ extern void typeRacer() {
                     charactersFilled--;
                 }
                 printLoadingBar(loading_bar);
-                end = time(NULL);
-                if(charactersFilled != 0)
-                    speed = (double)(end - start) / charactersFilled;
                 printSpeed(speed);
                 charactersRead--;
             }
