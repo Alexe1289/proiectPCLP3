@@ -187,13 +187,14 @@ void start_message() {
 	printw("                                                                                         \n");
 	printw("                                    2) MULTIPLAYER\n");
 	printw("                                                                                         \n");
-	printw("                                    3) AI vs AI\n");
+	printw("                                    3) Computer vs Computer\n");
 	printw("                                                                                         \n");
 	printw("                                    Press '1' or '2' or '3' : ");
 	refresh();
 }
 
 void multipl_confirmation(char* first_player_name, char* second_player_name, int* table_size) {
+	curs_set(2);
 	clear();
 	printw("#########################################################################################\n");
 	printw("#########################################################################################\n");
@@ -348,6 +349,7 @@ char final_message(int player, char* player1, char* player2) {
 }
 
 void singlepl_confirmation(char* player_name, int* table_size) {
+	curs_set(2);
 	clear();
 	printw("#########################################################################################\n");
 	printw("#########################################################################################\n");
@@ -371,7 +373,6 @@ void singlepl_confirmation(char* player_name, int* table_size) {
 
 extern void Tic_Tac_Toe() {
 	initscr();
-	//keypad(stdscr, TRUE);
 	start_message();
 	char player_choice;
 	scanw("%c", &player_choice);
