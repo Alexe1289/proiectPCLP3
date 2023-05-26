@@ -495,6 +495,7 @@ extern void Tic_Tac_Toe() {
 			continue_game = final_message(game_state, "X", "0");
 			break;
 		}
+		napms(850);
 		} while(1);
 		matr = free_matrix(matr, table_size);
 		} while(continue_game == 'Q' || continue_game == 'q');
